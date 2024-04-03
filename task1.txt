@@ -1,0 +1,77 @@
+import json
+class Task:
+    def __init__(self, id, description, completed=False):
+        self.id = id
+        self.description = description
+        self.completed = completed
+class TaskManager:
+    def __init__(self):
+        self.tasks = []
+    def add_task(self, description):
+        task_id = len(self.tasks) + 1
+        task = Task(task_id, description)
+        self.tasks.append(task)
+    def list_tasks(self):
+        for task in self.tasks:
+            print(f"{task.id}. [{'x' if task.completed else ' '}] {task.description}")
+    def mark_completed(self, task_id):
+        for task in self.tasks:
+            if task.id == task_id:
+                task.completed = True
+                return True
+        return False
+    def remove_task(self, task_id):
+        for task in self.tasks:
+            if task.id == task_id:
+                self.tasks.remove(task)
+                return True
+        return False
+    def save_tasks(self, filename):
+        with open(filename, 'w') as file:
+            json.dump([task.__dict__ for task in self.tasks], file)
+    def load_tasks(self, filename):
+        with open(filename, 'r') as file:
+            data = json.load(file)
+            self.tasks = [Task(**task) for task in data]
+def main():
+    task_manager = TaskManager()
+    while True:
+        print("\n1. Add a task:")
+        print("2. View all tasks")
+        print("3. Mark a task as completed")
+        print("4. Remove a task")
+        print("5. Save tasks to file")
+        print("6. Load tasks from file")
+        print("7. Exit")
+        choice = input("\nEnter your choice: ")
+        if choice == '1':
+            description = input("Enter task dsp: ")
+            task_manager.add_task(description)
+        elif choice == '2':
+            task_manager.list_tasks()
+        elif choice == '3':
+            task_id = int(input("Enter task ID to mark as completed: "))
+            if task_manager.mark_completed(task_id):
+                print("Task completed.")
+            else:
+                print("Task ID not found.")
+        elif choice == '4':
+            task_id = int(input("Enter task ID to remove: "))
+            if task_manager.remove_task(task_id):
+                print("Task removed.")
+            else:
+                print("Task ID not found.")
+        elif choice == '5':
+            filename = input("Enter filename to save tasks: ")
+            task_manager.save_tasks(filename)
+            print("Tasks saved to file.")
+        elif choice == '6':
+            filename = input("Enter filename to load tasks from: ")
+            task_manager.load_tasks(filename)
+            print("Tasks loaded from file.")
+        elif choice == '7':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+if __name__ == "__main__":
+    main()
